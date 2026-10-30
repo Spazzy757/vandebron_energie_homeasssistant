@@ -13,7 +13,6 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import config_entry_oauth2_flow
-from homeassistant.setup import async_setup_component
 
 from custom_components.vandebron_energie.const import (
     DOMAIN,
@@ -29,12 +28,6 @@ TOKEN = {
     "token_type": "Bearer",
     "expires_in": 7200,
 }
-
-
-@pytest.fixture(autouse=True)
-async def setup_component(hass: HomeAssistant) -> None:
-    """Load the integration (registers the OAuth2 implementation)."""
-    assert await async_setup_component(hass, DOMAIN, {})
 
 
 def _mock_vandebron(aioclient_mock: AiohttpClientMocker, email: str) -> None:

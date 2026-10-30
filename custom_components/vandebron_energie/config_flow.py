@@ -20,6 +20,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import VandebronApi, VandebronApiError, VandebronAuthError
 from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
+from .oauth import VandebronOAuth2Implementation
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +36,19 @@ class VandebronEnergieConfigFlow(
     @property
     def logger(self) -> logging.Logger:
         return _LOGGER
+
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Register the implementation: async_setup has not run before the first flow."""
+        implementations = await config_entry_oauth2_flow.async_get_implementations(
+            self.hass, DOMAIN
+        )
+        if DOMAIN not in implementations:
+            config_entry_oauth2_flow.async_register_implementation(
+                self.hass, DOMAIN, VandebronOAuth2Implementation(self.hass)
+            )
+        return await super().async_step_user(user_input)
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
